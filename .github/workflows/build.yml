@@ -1,0 +1,39 @@
+name: Build Thamer TV APK
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Buildozer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libportaudio2 git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev cmake
+
+      - name: Install Buildozer
+        run: pip install buildozer cython kivy
+
+      - name: Initialize Buildozer
+        run: |
+          buildozer init
+          sed -i 's/# requirements = kivy/requirements = python3,kivy/g' buildozer.spec
+          sed -i 's/package.name = myapp/package.name = thamertv/g' buildozer.spec
+          sed -i 's/title = My Application/title = THAMER TV/g' buildozer.spec
+
+      - name: Build Android APK
+        run: |
+          yes | buildozer -v android debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ThamerTV-Standalone-APK
+          path: bin/*.apk
