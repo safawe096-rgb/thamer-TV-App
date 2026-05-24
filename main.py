@@ -70,3 +70,4 @@ class ThamerTVApp(App):
 
 if __name__ == '__main__':
     ThamerTVApp().run()
+    # THAMER TV SMART APP 2026
